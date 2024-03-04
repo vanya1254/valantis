@@ -1,13 +1,16 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import md5 from "md5";
 
+import { Pagination } from "../../components";
+
+import { getTimestamp } from "../../utils";
+
 import styles from "./Products.module.scss";
-import { act } from "react-dom/test-utils";
 
 export const Products = () => {
-  const getTimestamp = () => {
-    return `${new Date().toISOString().slice(0, 10).replace(/-/g, "")}`;
-  };
+  const [itemsList, setItemsList] = useState([]);
+
   const PASSWORD = `Valantis_${getTimestamp()}`;
   const HASH = md5(PASSWORD);
 
@@ -17,7 +20,7 @@ export const Products = () => {
         method: "POST",
         body: JSON.stringify({
           action: "get_ids",
-          params: { offset: 10, limit: 3 },
+          params: { offset: 0, limit: 10 },
         }),
         headers: {
           "Content-type": "application/json; charset=UTF-8",
@@ -51,13 +54,11 @@ export const Products = () => {
     } catch (error) {}
   };
 
-  let itemsList = [];
-
   const getStore = async () => {
     try {
       const ids = await getIds();
       const items = await getItemsByIds(ids);
-      itemsList = items;
+      setItemsList(items);
     } catch (error) {
       console.error(error);
     }
@@ -70,5 +71,30 @@ export const Products = () => {
     fetchData();
   }, []);
 
-  return <div className={styles.root}>{itemsList}</div>;
+  return (
+    <>
+      <div className={styles.root}>
+        {itemsList.length
+          ? itemsList.map((item, i) => (
+              <Link to={`/products/${item.id}`} key={i}>
+                <div className={styles.root__product}>
+                  <img
+                    className={styles.root__product_img}
+                    src="https://valantis.store/_next/image?url=https%3A%2F%2Fvalantis.store%2Fmedia%2Fproducts%2F356a192b79%2Fkolco-iisus.png&w=384&q=75"
+                    alt="ring"
+                  />
+                  <div className={styles.root__product__content}>
+                    <p className={styles.root__product_name}>{item.product}</p>
+                    <p className={styles.root__product_price}>
+                      {item.price} {"₽"}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))
+          : "LOADING"}
+      </div>
+      <Pagination />
+    </>
+  );
 };
