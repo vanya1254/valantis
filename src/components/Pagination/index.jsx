@@ -6,10 +6,12 @@ import styles from "./Pagination.module.scss";
 export const Pagination = ({ currentPage, setCurrentPage }) => {
   const onClickPrevPage = () => {
     setCurrentPage((prev) => (prev === "1" ? prev : `${Number(prev) - 1}`));
+    window.scrollTo(0, 0);
   };
 
   const onClickNextPage = () => {
     setCurrentPage((prev) => `${Number(prev) + 1}`);
+    window.scrollTo(0, 0);
   };
 
   return (

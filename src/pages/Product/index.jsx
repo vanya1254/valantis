@@ -4,7 +4,8 @@ import { useParams } from "react-router-dom";
 import { NotFound } from "../NotFound";
 import { Loading } from "../../components";
 
-import { getItemsByIds } from "../../api/fetch";
+import { getData } from "../../api/fetch";
+import { URLS_API, ACTIONS, PARAMS } from "../../api/constantsKeys";
 import { isEmptyObj } from "../../utils";
 
 import styles from "./Product.module.scss";
@@ -15,7 +16,11 @@ export const Product = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getItemsByIds([params.id]);
+      const data = await getData(
+        URLS_API.api1,
+        ACTIONS.getItems,
+        PARAMS.getItems([params.id])
+      );
       const product =
         (await data) !== undefined && data.length ? data[0] : null;
 

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 
-import { Pagination, Loading } from "../../components";
+import { Filter, Pagination, Loading } from "../../components";
 
-import { getIds, getItemsByIds } from "../../api/fetch";
+import { getData } from "../../api/fetch";
+import { URLS_API, ACTIONS, PARAMS } from "../../api/constantsKeys";
 import { isEmptyObj } from "../../utils";
 import { LIMIT } from "../../constants";
 
@@ -23,13 +24,22 @@ export const Products = () => {
     isEmptyObj(pageParams) ? "1" : pageParams.pageNumber
   );
 
-  const paramsObj = { offset: 50 * (Number(pageNumber) - 1), limit: LIMIT };
+  const idsParamsObj = { offset: 50 * (Number(pageNumber) - 1), limit: LIMIT };
   const cleanItemsList = [];
 
   const getProducts = async () => {
     try {
-      const ids = await getIds(paramsObj);
-      const items = await getItemsByIds(ids);
+      const ids = await getData(
+        URLS_API.api1,
+        ACTIONS.getIds,
+        PARAMS.getIds(idsParamsObj.offset, idsParamsObj.limit)
+      );
+      const items = await getData(
+        URLS_API.api1,
+        ACTIONS.getItems,
+        PARAMS.getItems(ids)
+      );
+
       setItemsList(items);
     } catch (error) {
       console.error(error);
@@ -54,6 +64,7 @@ export const Products = () => {
     itemsList.forEach((item) => checkItem(item, cleanItemsList));
     return (
       <>
+        <Filter />
         <div className={styles.root}>
           {cleanItemsList.map((item) => (
             <Link to={`/products/${item.id}`} key={item.id}>
