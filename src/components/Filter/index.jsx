@@ -6,22 +6,26 @@ import { URLS_API, ACTIONS, PARAMS } from "../../api/constantsKeys";
 import styles from "./Filter.module.scss";
 
 export const Filter = () => {
-  const [fieldsList, setFieldsList] = useState([]);
+  const [itemsList, setItemsList] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       const data = await getData(
         URLS_API.api1,
-        ACTIONS.getFields,
-        PARAMS.getFields("product", 0, 50)
+        ACTIONS.filter,
+        PARAMS.filter({ product: "" })
       );
 
-      setFieldsList(data);
+      const items = await getData(URLS_API.api1, ACTIONS.getItems, {
+        ...PARAMS.getItems([...data]),
+      });
+
+      setItemsList(data);
     };
     fetchData();
   }, []);
 
-  return fieldsList !== undefined && fieldsList.length ? (
+  return itemsList !== undefined && itemsList.length ? (
     <div className={styles.root}>
       <form action="">
         <input id="search" type="text" placeholder="Search..." />
