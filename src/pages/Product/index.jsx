@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { NotFound } from "../NotFound";
 import { Loading } from "../../components";
 
-import { getItemsByIds } from "../Products";
+import { getItemsByIds } from "../../api/fetch";
 import { isEmptyObj } from "../../utils";
 
 import styles from "./Product.module.scss";
