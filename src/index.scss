@@ -32,6 +32,13 @@ code {
   user-select: none;
 }
 
+.selected {
+  pointer-events: none;
+  cursor: auto;
+  background-color: brown;
+  color: white;
+}
+
 /* Reset and base styles  */
 * {
   padding: 0px;

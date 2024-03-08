@@ -16,9 +16,6 @@
     padding-bottom: 16px;
     gap: 16px;
 
-    cursor: pointer;
-    transition: 0.3s ease-in-out;
-
     &_img {
     }
 
@@ -37,8 +34,12 @@
       color: $secondColor;
     }
 
-    &:hover {
-      box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.123);
+    &_hover {
+      transition: 0.3s ease-in-out;
+
+      &:hover {
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.123);
+      }
     }
   }
 

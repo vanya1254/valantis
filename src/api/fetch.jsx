@@ -1,25 +1,30 @@
 import { hash } from "./dynamicKeys";
 
 export const getData = async (urlApi, action, params) => {
-  try {
-    const res = await fetch(urlApi, {
-      method: "POST",
-      body: JSON.stringify({
-        action: action,
-        params,
-      }),
-      headers: {
-        "Content-type": "application/json; charset=UTF-8",
-        "X-Auth": hash,
-      },
-    });
+  let condition = true;
 
-    const { result } = await res.json();
+  while (condition) {
+    try {
+      const res = await fetch(urlApi, {
+        method: "POST",
+        body: JSON.stringify({
+          action: action,
+          params,
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+          "X-Auth": hash,
+        },
+      });
 
-    return result;
-  } catch (error) {
-    if (error.status !== undefined) {
-      console.error(error.status);
+      const { result } = await res.json();
+      condition = !condition;
+
+      return result;
+    } catch (error) {
+      if (error.status !== undefined) {
+        console.error(error.status);
+      }
     }
   }
 };

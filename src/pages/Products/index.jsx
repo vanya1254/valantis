@@ -1,31 +1,112 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 
 import { Filter, Pagination, Loading } from "../../components";
 
 import { getData } from "../../api/fetch";
 import { URLS_API, ACTIONS, PARAMS } from "../../api/constantsKeys";
-import { isEmptyObj } from "../../utils";
+import {
+  isEmptyObj,
+  getFiltersWithoutEmpty,
+  curPageItems,
+  addToArrayUniqueItem,
+  getArrayOfDuplicates,
+} from "../../utils";
 import { LIMIT } from "../../constants";
 
 import styles from "./Products.module.scss";
 
+export const getBrands = async () => {
+  try {
+    const data = await getData(URLS_API.api1, ACTIONS.getFields, {
+      field: "brand",
+    });
+
+    const result = [
+      "ALL",
+      ...new Set(await data.filter((brand) => brand !== null)),
+    ];
+
+    return result;
+  } catch (error) {}
+};
+
 export const Products = () => {
+  const isFirstLoading = useRef(true);
+  const isFiltered = useRef(false);
   const pageParams = useParams();
   const navigate = useNavigate();
-  useEffect(() => {
-    if (Number.isNaN(Number(pageParams.pageNumber))) {
-      navigate("/products");
-    }
-  }, []);
 
   const [itemsList, setItemsList] = useState([]);
+  const [currentItemsList, setCurrentItemsList] = useState([]);
+  const [filters, setFilters] = useState({});
+  const [brands, setBrands] = useState([]);
   const [pageNumber, setPageNumber] = useState(
     isEmptyObj(pageParams) ? "1" : pageParams.pageNumber
   );
 
-  const idsParamsObj = { offset: 50 * (Number(pageNumber) - 1), limit: LIMIT };
-  const cleanItemsList = [];
+  const idsParamsObj = {
+    offset: LIMIT * (Number(pageNumber) - 1),
+    limit: LIMIT,
+  };
+
+  const setFiltersByFields = (fields) => {
+    setFilters((prev) => {
+      const updatedFilters = {};
+      fields.forEach((field) => {
+        if (field === "brand") {
+          updatedFilters[field] = "ALL";
+        } else {
+          updatedFilters[field] = prev ? prev[field] || "" : "";
+        }
+      });
+
+      return updatedFilters;
+    });
+  };
+
+  const getStore = async () => {
+    try {
+      const dataFields = await getData(URLS_API.api1, ACTIONS.getFields);
+
+      const dataBrands = await getBrands();
+
+      const data = await getData(
+        URLS_API.api1,
+        ACTIONS.getIds,
+        PARAMS.getIds(idsParamsObj.offset, idsParamsObj.limit)
+      );
+
+      const items = await getData(URLS_API.api1, ACTIONS.getItems, {
+        ...PARAMS.getItems(await data),
+      });
+
+      setFiltersByFields(await dataFields);
+      setBrands(dataBrands);
+      setItemsList(await items);
+
+      // setCurrentItemsList(itemsList);
+      // setCurrentItemsList([...curPageItems(items,idsParamsObj.offset, idsParamsObj.limit + idsParamsObj.offset)]);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (Number.isNaN(Number(pageParams.pageNumber))) {
+      navigate("/products");
+    }
+    if (!isFiltered.current && isFirstLoading.current) {
+      const fetchStore = async () => {
+        await getStore();
+      };
+
+      fetchStore();
+
+      console.log(111);
+      isFirstLoading.current = false;
+    }
+  }, []);
 
   const getProducts = async () => {
     try {
@@ -47,27 +128,85 @@ export const Products = () => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      await getProducts();
-    };
-    fetchData();
+    if (!isFirstLoading.current && !isFiltered.current) {
+      const fetchProducts = async () => {
+        await getProducts();
+      };
+      fetchProducts();
+      console.log(222);
+    }
+    console.log(333);
   }, [pageParams]);
 
-  const checkItem = (item, array) => {
-    const i = array.findIndex((x) => x.id === item.id);
-    if (i <= -1) {
-      array.push({ ...item });
+  const getIdsByFilters = async (currentFilters) => {
+    let data = [];
+
+    for (const filter in currentFilters) {
+      const filterValue = Number.isNaN(Number(currentFilters[filter]))
+        ? `${currentFilters[filter]}`
+        : currentFilters[filter];
+
+      const dataByFilter = await getData(
+        URLS_API.api1,
+        ACTIONS.filter,
+        PARAMS.filter({ [filter]: filterValue })
+      );
+
+      data.push(...dataByFilter);
+    }
+
+    const filteredData =
+      Object.entries(currentFilters).length > 1
+        ? getArrayOfDuplicates(data)
+        : data;
+
+    return filteredData;
+  };
+
+  const getFilteredStore = async () => {
+    const currentFilters = getFiltersWithoutEmpty(filters);
+
+    if (Object.keys(currentFilters).length) {
+      const data = await getIdsByFilters(currentFilters);
+
+      const items = await getData(URLS_API.api1, ACTIONS.getItems, {
+        ...PARAMS.getItems(data),
+      });
+
+      setItemsList(items);
     }
   };
 
-  if (itemsList !== undefined && itemsList.length) {
-    itemsList.forEach((item) => checkItem(item, cleanItemsList));
+  useEffect(() => {
+    if (isFiltered.current) {
+      const fetchFilteredData = async () => {
+        await getFilteredStore();
+      };
+
+      fetchFilteredData();
+      isFiltered.current = false;
+    }
+  }, [filters]);
+
+  if (itemsList) {
+    const cleanItemsList = [];
+    itemsList.forEach((item) => addToArrayUniqueItem(item, cleanItemsList));
+
     return (
       <>
-        <Filter />
+        <Filter
+          brands={brands}
+          filters={filters}
+          setFilters={setFilters}
+          isFiltered={isFiltered}
+        />
         <div className={styles.root}>
           {cleanItemsList.map((item) => (
-            <Link to={`/products/${item.id}`} key={item.id}>
+            <Link
+              className={styles.root__product_hover}
+              to={`/products/${item.id}`}
+              key={item.id}
+            >
               <div className={styles.root__product}>
                 <img
                   className={styles.root__product_img}
@@ -75,7 +214,9 @@ export const Products = () => {
                   alt="ring"
                 />
                 <div className={styles.root__product__content}>
-                  <p className={styles.root__product_name}>{item.product}</p>
+                  <p className={styles.root__product_name}>
+                    {item.brand && item.brand} {item.product}
+                  </p>
                   <p className={styles.root__product_price}>
                     {item.price} {"₽"}
                   </p>
