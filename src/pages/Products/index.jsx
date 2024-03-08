@@ -8,7 +8,6 @@ import { URLS_API, ACTIONS, PARAMS } from "../../api/constantsKeys";
 import {
   isEmptyObj,
   getFiltersWithoutEmpty,
-  curPageItems,
   addToArrayUniqueItem,
   getArrayOfDuplicates,
 } from "../../utils";
@@ -37,8 +36,8 @@ export const Products = () => {
   const pageParams = useParams();
   const navigate = useNavigate();
 
+  const [isLoading, setIsLoading] = useState(true);
   const [itemsList, setItemsList] = useState([]);
-  const [currentItemsList, setCurrentItemsList] = useState([]);
   const [filters, setFilters] = useState({});
   const [brands, setBrands] = useState([]);
   const [pageNumber, setPageNumber] = useState(
@@ -99,11 +98,12 @@ export const Products = () => {
     if (!isFiltered.current && isFirstLoading.current) {
       const fetchStore = async () => {
         await getStore();
+
+        setIsLoading(false);
       };
 
       fetchStore();
 
-      console.log(111);
       isFirstLoading.current = false;
     }
   }, []);
@@ -130,12 +130,14 @@ export const Products = () => {
   useEffect(() => {
     if (!isFirstLoading.current && !isFiltered.current) {
       const fetchProducts = async () => {
+        setIsLoading(true);
+
         await getProducts();
+
+        setIsLoading(false);
       };
       fetchProducts();
-      console.log(222);
     }
-    console.log(333);
   }, [pageParams]);
 
   const getIdsByFilters = async (currentFilters) => {
@@ -180,7 +182,11 @@ export const Products = () => {
   useEffect(() => {
     if (isFiltered.current) {
       const fetchFilteredData = async () => {
+        setIsLoading(true);
+
         await getFilteredStore();
+
+        setIsLoading(false);
       };
 
       fetchFilteredData();
@@ -188,7 +194,7 @@ export const Products = () => {
     }
   }, [filters]);
 
-  if (itemsList) {
+  if (!isLoading) {
     const cleanItemsList = [];
     itemsList.forEach((item) => addToArrayUniqueItem(item, cleanItemsList));
 
