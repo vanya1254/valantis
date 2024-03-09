@@ -21,10 +21,7 @@ export const getBrands = async () => {
       field: "brand",
     });
 
-    const result = [
-      // "ALL",
-      ...new Set(await data.filter((brand) => brand !== null)),
-    ];
+    const result = [...new Set(await data.filter((brand) => brand !== null))];
 
     return result;
   } catch (error) {}
@@ -55,11 +52,7 @@ export const Products = () => {
     setFilters((prev) => {
       const updatedFilters = {};
       fields.forEach((field) => {
-        // if (field === "brand") {
-        //   updatedFilters[field] = "ALL";
-        // } else {
         updatedFilters[field] = prev ? prev[field] || "" : "";
-        // }
       });
 
       return updatedFilters;
@@ -188,9 +181,6 @@ export const Products = () => {
 
       setItemsList(await items);
     }
-    // else {
-    //   isFiltered.current = false;
-    // }
   };
 
   useEffect(() => {
