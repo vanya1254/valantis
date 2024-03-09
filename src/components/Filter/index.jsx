@@ -4,10 +4,17 @@ import styles from "./Filter.module.scss";
 
 export const Filter = ({ brands, filters, setFilters, isFiltered }) => {
   const searchRef = useRef();
-  const [sliderValue, setSliderValue] = useState(0);
+  const [sliderValue, setSliderValue] = useState();
 
   const handleSliderChange = (event) => {
-    setSliderValue(event.target.value);
+    if (
+      !Number.isNaN(Number(event.target.value)) &&
+      Number(event.target.value) !== 0
+    ) {
+      setSliderValue(event.target.value);
+    } else {
+      setSliderValue("");
+    }
   };
 
   const onClickSearch = (e) => {
@@ -37,7 +44,16 @@ export const Filter = ({ brands, filters, setFilters, isFiltered }) => {
   const onClickBrand = (e) => {
     const brandValue = e.currentTarget.innerHTML.replace("&amp;", "&");
 
-    if (brandValue !== null) {
+    if (brandValue === "ALL") {
+      setFilters((prev) => {
+        for (const key in prev) {
+          prev[key] = "";
+        }
+
+        return { ...prev };
+      });
+      window.history.pushState({}, "", "/products/page/1");
+    } else if (brandValue !== null) {
       setFilters((prev) => {
         prev.brand = brandValue;
 
@@ -52,16 +68,16 @@ export const Filter = ({ brands, filters, setFilters, isFiltered }) => {
       <div className={styles.root__top}>
         <div className={styles.root__price}>
           <input
-            type="range"
-            min={0}
-            max={1000000}
-            value={sliderValue}
+            type="text"
+            value={sliderValue || ""}
             onChange={handleSliderChange}
+            placeholder={"Price... Ex: 10000"}
           />
-          <div className={styles.root__price__submit}>
-            <p>Value: {sliderValue} ₽</p>
-            <button onClick={onClickSubmit}>submit</button>
-          </div>
+          ₽
+          {/* <div className={styles.root__price__submit}>
+            <p>Value: {sliderValue} ₽</p> */}
+          <button onClick={onClickSubmit}>submit</button>
+          {/* </div> */}
         </div>
         <form className={styles.root__search}>
           <input
@@ -74,12 +90,20 @@ export const Filter = ({ brands, filters, setFilters, isFiltered }) => {
         </form>
       </div>
       <div className={styles.root__brands}>
+        <button
+          onClick={onClickBrand}
+          className={`${styles.root__brands_btn} ${
+            filters.brand ? "" : "selected"
+          }`}
+        >
+          {"ALL"}
+        </button>
         {brands.map((brand, i) => (
           <button
             onClick={onClickBrand}
             key={i}
             className={`${styles.root__brands_btn} ${
-              filters.brand == brand ? "selected" : ""
+              filters.brand === brand ? "selected" : ""
             }`}
           >
             {brand}

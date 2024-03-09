@@ -22,7 +22,7 @@ export const getBrands = async () => {
     });
 
     const result = [
-      "ALL",
+      // "ALL",
       ...new Set(await data.filter((brand) => brand !== null)),
     ];
 
@@ -38,6 +38,7 @@ export const Products = () => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isItemsLoading, setIsItemsLoading] = useState(true);
+  const [isLastPage, setIsLastPage] = useState(false);
   const [itemsList, setItemsList] = useState([]);
   const [filters, setFilters] = useState({});
   const [brands, setBrands] = useState([]);
@@ -54,11 +55,11 @@ export const Products = () => {
     setFilters((prev) => {
       const updatedFilters = {};
       fields.forEach((field) => {
-        if (field === "brand") {
-          updatedFilters[field] = "ALL";
-        } else {
-          updatedFilters[field] = prev ? prev[field] || "" : "";
-        }
+        // if (field === "brand") {
+        //   updatedFilters[field] = "ALL";
+        // } else {
+        updatedFilters[field] = prev ? prev[field] || "" : "";
+        // }
       });
 
       return updatedFilters;
@@ -85,8 +86,11 @@ export const Products = () => {
       setBrands(dataBrands);
       setItemsList(await items);
 
-      // setCurrentItemsList(itemsList);
-      // setCurrentItemsList([...curPageItems(items,idsParamsObj.offset, idsParamsObj.limit + idsParamsObj.offset)]);
+      if ((await items.length) < LIMIT) {
+        setIsLastPage(true);
+      } else {
+        setIsLastPage(false);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -122,7 +126,13 @@ export const Products = () => {
         PARAMS.getItems(ids)
       );
 
-      setItemsList(items);
+      setItemsList(await items);
+
+      if ((await items.length) < LIMIT) {
+        setIsLastPage(true);
+      } else {
+        setIsLastPage(false);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -139,7 +149,7 @@ export const Products = () => {
       };
       fetchProducts();
     }
-  }, [pageParams]);
+  }, [pageParams, filters]);
 
   const getIdsByFilters = async (currentFilters) => {
     let data = [];
@@ -176,8 +186,11 @@ export const Products = () => {
         ...PARAMS.getItems(data),
       });
 
-      setItemsList(items);
+      setItemsList(await items);
     }
+    // else {
+    //   isFiltered.current = false;
+    // }
   };
 
   useEffect(() => {
@@ -187,6 +200,9 @@ export const Products = () => {
 
         await getFilteredStore();
 
+        setIsLastPage(true);
+        setPageNumber("1");
+        window.history.pushState("", "", `/products`);
         setIsItemsLoading(false);
       };
 
@@ -234,7 +250,11 @@ export const Products = () => {
                 </Link>
               ))}
         </div>
-        <Pagination currentPage={pageNumber} setCurrentPage={setPageNumber} />
+        <Pagination
+          currentPage={pageNumber}
+          setCurrentPage={setPageNumber}
+          isLastPage={isLastPage}
+        />
       </>
     );
   } else {
