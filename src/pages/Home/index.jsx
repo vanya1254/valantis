@@ -7,7 +7,7 @@ export const Home = () => {
   return (
     <div className={styles.root}>
       <h1 className={styles.root_title}>Welcome to test task Valantis page</h1>
-      <Link className={styles.root_link} to={"/valantis/products"}>
+      <Link className={styles.root_link} to={"/valantis/products/page/1"}>
         Products
       </Link>
     </div>

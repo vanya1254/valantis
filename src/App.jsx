@@ -13,7 +13,7 @@ const App = () => {
     <div className="App">
       <Routes>
         <Route path="valantis/" element={<Home />}></Route>
-        <Route path="valantis/products" element={<Products />}></Route>
+        {/* <Route path="valantis/products" element={<Products />}></Route> */}
         <Route
           path="valantis/products/page/:pageNumber"
           element={<Products />}
