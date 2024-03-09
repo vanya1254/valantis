@@ -1,6 +1,6 @@
 export const URLS_API = {
-  api1: "http://api.valantis.store:41000/",
-  api2: "https://api.valantis.store:40000/",
+  api1: "https://api.valantis.store:41000/",
+  api2: "http://api.valantis.store:40000/",
 };
 
 export const ACTIONS = {
