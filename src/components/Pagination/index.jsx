@@ -24,7 +24,7 @@ export const Pagination = ({ currentPage, setCurrentPage, isLastPage }) => {
         >
           <Link
             onClick={onClickPrevPage}
-            to={`valantis/products/page/${Number(currentPage) - 1}`}
+            to={`products/page/${Number(currentPage) - 1}`}
           >{`<`}</Link>
         </li>
         <li>{currentPage}</li>
@@ -33,7 +33,7 @@ export const Pagination = ({ currentPage, setCurrentPage, isLastPage }) => {
         >
           <Link
             onClick={onClickNextPage}
-            to={`valantis/products/page/${Number(currentPage) + 1}`}
+            to={`products/page/${Number(currentPage) + 1}`}
           >{`>`}</Link>
         </li>
       </ul>

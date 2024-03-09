@@ -219,7 +219,7 @@ export const Products = () => {
             : cleanItemsList.map((item) => (
                 <Link
                   className={styles.root__product_hover}
-                  to={`/products/${item.id}`}
+                  to={`products/${item.id}`}
                   key={item.id}
                 >
                   <div className={styles.root__product}>

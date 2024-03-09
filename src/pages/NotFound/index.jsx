@@ -8,10 +8,10 @@ export const NotFound = () => {
     <div className={styles.root}>
       <h1 className={styles.root_title}>The page was not found</h1>
       <div className={styles.root__links}>
-        <Link className={styles.root_link} to={"/"}>
+        <Link className={styles.root_link} to={"valantis/"}>
           Home
         </Link>
-        <Link className={styles.root_link} to={"/products"}>
+        <Link className={styles.root_link} to={"valantis/products"}>
           Products
         </Link>
       </div>

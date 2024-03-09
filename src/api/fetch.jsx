@@ -22,8 +22,15 @@ export const getData = async (urlApi, action, params) => {
 
       return result;
     } catch (error) {
-      if (error.status !== undefined) {
+      if (
+        error.status !== undefined &&
+        error.status !== 400 &&
+        error.status !== 401 &&
+        error.status !== 500
+      ) {
         console.error(error.status);
+      } else {
+        condition = !condition;
       }
     }
   }
