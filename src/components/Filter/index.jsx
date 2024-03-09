@@ -52,7 +52,7 @@ export const Filter = ({ brands, filters, setFilters, isFiltered }) => {
 
         return { ...prev };
       });
-      window.history.pushState({}, "", "/products/page/1");
+      window.history.pushState({}, "", "/valantis/products/page/1");
     } else if (brandValue !== null) {
       setFilters((prev) => {
         prev.brand = brandValue;

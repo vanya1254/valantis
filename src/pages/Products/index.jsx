@@ -91,7 +91,7 @@ export const Products = () => {
 
   useEffect(() => {
     if (Number.isNaN(Number(pageParams.pageNumber))) {
-      navigate("/products");
+      navigate("/valantis/products");
     }
     if (!isFiltered.current && isFirstLoading.current) {
       const fetchStore = async () => {
@@ -192,7 +192,7 @@ export const Products = () => {
 
         setIsLastPage(true);
         setPageNumber("1");
-        window.history.pushState("", "", `/products`);
+        window.history.pushState("", "", `/valantis/products`);
         setIsItemsLoading(false);
       };
 
