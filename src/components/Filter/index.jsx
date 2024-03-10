@@ -1,11 +1,9 @@
 import { useRef, useState } from "react";
-import { useHistory } from "react-router-dom";
 
 import styles from "./Filter.module.scss";
 
 export const Filter = ({ brands, filters, setFilters, isFiltered }) => {
   const searchRef = useRef();
-  const history = useHistory();
   const [sliderValue, setSliderValue] = useState();
 
   const handleSliderChange = (event) => {
@@ -54,7 +52,7 @@ export const Filter = ({ brands, filters, setFilters, isFiltered }) => {
 
         return { ...prev };
       });
-      history.push("/valantis/products/page/1");
+      window.history.pushState("", "", "/valantis/products/page/1");
     } else if (brandValue !== null) {
       setFilters((prev) => {
         prev.brand = brandValue;
