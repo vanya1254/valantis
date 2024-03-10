@@ -17,11 +17,24 @@ export const Filter = ({ brands, filters, setFilters, isFiltered }) => {
     }
   };
 
+  const handleCleanFilter = () => {
+    setFilters((prev) => {
+      for (const key in prev) {
+        prev[key] = "";
+      }
+
+      return { ...prev };
+    });
+    window.history.pushState("", "", "/valantis/products/page/1");
+  };
+
   const onClickSearch = (e) => {
     e.preventDefault();
     const searchValue = searchRef.current.value.trim();
 
-    if (searchValue !== "") {
+    if (searchValue === "") {
+      handleCleanFilter();
+    } else {
       setFilters((prev) => {
         prev.product = searchValue;
         return { ...prev };
@@ -31,7 +44,9 @@ export const Filter = ({ brands, filters, setFilters, isFiltered }) => {
   };
 
   const onClickSubmit = (e) => {
-    if (sliderValue !== 0) {
+    if (sliderValue === "") {
+      handleCleanFilter();
+    } else if (sliderValue !== 0) {
       setFilters((prev) => {
         prev.price = Number(sliderValue);
 
@@ -45,14 +60,7 @@ export const Filter = ({ brands, filters, setFilters, isFiltered }) => {
     const brandValue = e.currentTarget.innerHTML.replace("&amp;", "&");
 
     if (brandValue === "ALL") {
-      setFilters((prev) => {
-        for (const key in prev) {
-          prev[key] = "";
-        }
-
-        return { ...prev };
-      });
-      window.history.pushState("", "", "/valantis/products/page/1");
+      handleCleanFilter();
     } else if (brandValue !== null) {
       setFilters((prev) => {
         prev.brand = brandValue;
