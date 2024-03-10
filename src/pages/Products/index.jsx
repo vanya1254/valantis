@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { Link, useParams, useNavigate, useHistory } from "react-router-dom";
 
 import { Filter, Pagination, Loading, Skeletons } from "../../components";
 
@@ -32,6 +32,7 @@ export const Products = () => {
   const isFiltered = useRef(false);
   const pageParams = useParams();
   const navigate = useNavigate();
+  const history = useHistory();
 
   const [isLoading, setIsLoading] = useState(true);
   const [isItemsLoading, setIsItemsLoading] = useState(true);
@@ -192,7 +193,7 @@ export const Products = () => {
 
         setIsLastPage(true);
         setPageNumber("1");
-        window.history.pushState("", "", `/valantis/products/page/1`);
+        history.push(`/valantis/products/page/1`);
         setIsItemsLoading(false);
       };
 
